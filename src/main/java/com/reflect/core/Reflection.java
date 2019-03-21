@@ -11,9 +11,9 @@ import java.lang.reflect.Modifier;
 public final class Reflection {
 
     @SuppressWarnings("unchecked")
-    public static <T> Class<T> init(ClassLoader loader, String srcClass, Class<?> injectClass) {
+    public static <T> Class<T> init(ClassLoader classLoader, String srcClass, Class<?> injectClass) {
         try {
-            return (Class<T>) init(loader.loadClass(srcClass), injectClass);
+            return (Class<T>) init(classLoader, classLoader.loadClass(srcClass), injectClass);
         } catch (ClassNotFoundException ignore) {
 //            ignore.printStackTrace();
             return null;
@@ -23,25 +23,25 @@ public final class Reflection {
     @SuppressWarnings("unchecked")
     public static <T> Class<T> init(String srcClass, Class<?> injectClass) {
         try {
-            return (Class<T>) init(Class.forName(srcClass), injectClass);
+            return (Class<T>) init(ClassLoader.getSystemClassLoader(), Class.forName(srcClass), injectClass);
         } catch (ClassNotFoundException ignore) {
 //            ignore.printStackTrace();
             return null;
         }
     }
 
-    public static <T> Class<T> init(Class<T> srcClass, Class<?> injectClass) {
+    public static <T> Class<T> init(ClassLoader classLoader, Class<T> srcClass, Class<?> injectClass) {
         java.lang.reflect.Field[] injectFields = injectClass.getDeclaredFields();
         for (java.lang.reflect.Field injectField : injectFields) {
             if (!Modifier.isStatic(injectField.getModifiers()))
                 continue;
             Class<?> classType = injectField.getType();
             if (classType == Constructor.class) {
-                linkToConstructor(srcClass, injectField);
+                linkToConstructor(classLoader, srcClass, injectField);
             } else if (classType == Method.class) {
-                linkToMethod(srcClass, injectField);
+                linkToMethod(classLoader, srcClass, injectField);
             } else if (classType == StaticMethod.class) {
-                linkToStaticMethod(srcClass, injectField);
+                linkToStaticMethod(classLoader, srcClass, injectField);
             } else if (classType == Field.class) {
                 linkToField(srcClass, injectField);
             } else if (classType == StaticField.class) {
@@ -51,9 +51,9 @@ public final class Reflection {
         return srcClass;
     }
 
-    private static void linkToConstructor(Class<?> clazz, java.lang.reflect.Field injectField) {
+    private static void linkToConstructor(ClassLoader classLoader, Class<?> clazz, java.lang.reflect.Field injectField) {
         try {
-            Constructor<?> constructor = getConstructor(clazz, getParameterTypes(injectField));
+            Constructor<?> constructor = getConstructor(clazz, getParameterTypes(classLoader, injectField));
             if (constructor != null) {
                 injectField.setAccessible(true);
                 injectField.set(null, constructor);
@@ -62,11 +62,11 @@ public final class Reflection {
         }
     }
 
-    private static void linkToMethod(Class<?> clazz, java.lang.reflect.Field injectField) {
+    private static void linkToMethod(ClassLoader classLoader, Class<?> clazz, java.lang.reflect.Field injectField) {
         try {
             String name = injectField.isAnnotationPresent(Parameter.class) && !injectField.getAnnotation(Parameter.class).name().isEmpty()
                 ? injectField.getAnnotation(Parameter.class).name() : injectField.getName();
-            Method<?> method = getMethod(clazz, name, getParameterTypes(injectField));
+            Method<?> method = getMethod(clazz, name, getParameterTypes(classLoader, injectField));
             if (method != null) {
                 injectField.setAccessible(true);
                 injectField.set(null, method);
@@ -75,11 +75,11 @@ public final class Reflection {
         }
     }
 
-    private static void linkToStaticMethod(Class<?> clazz, java.lang.reflect.Field injectField) {
+    private static void linkToStaticMethod(ClassLoader classLoader, Class<?> clazz, java.lang.reflect.Field injectField) {
         try {
             String name = injectField.isAnnotationPresent(Parameter.class) && !injectField.getAnnotation(Parameter.class).name().isEmpty()
                 ? injectField.getAnnotation(Parameter.class).name() : injectField.getName();
-            StaticMethod<?> staticMethod = getStaticMethod(clazz, name, getParameterTypes(injectField));
+            StaticMethod<?> staticMethod = getStaticMethod(clazz, name, getParameterTypes(classLoader, injectField));
             if (staticMethod != null) {
                 injectField.setAccessible(true);
                 injectField.set(null, staticMethod);
@@ -114,7 +114,7 @@ public final class Reflection {
         }
     }
 
-    private static Class<?>[] getParameterTypes(AccessibleObject object) {
+    private static Class<?>[] getParameterTypes(ClassLoader classLoader, AccessibleObject object) {
         if (object.isAnnotationPresent(Parameter.class)) {
             Parameter param = object.getAnnotation(Parameter.class);
             if (param.value().length > 0) {
@@ -152,7 +152,7 @@ public final class Reflection {
             for (int i = 0; i < N; i++) {
                 if (!strParams[i].isEmpty()) {
                     try {
-                        clsParams[i] = Class.forName(strParams[i]);
+                        clsParams[i] = classLoader.loadClass(strParams[i]);
                     } catch (ClassNotFoundException ignore) {
                     }
                 } else if (clsParams[i] == Void.class) {
