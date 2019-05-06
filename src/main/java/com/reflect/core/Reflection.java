@@ -277,8 +277,8 @@ public final class Reflection {
         }
     }
 
-    public static FieldWrapper streamGetObject(Object obj) {
-        return new FieldWrapper(obj);
+    public static ObjectWrapper streamGetObject(Object obj) {
+        return new ObjectWrapper(obj);
     }
 
 }
