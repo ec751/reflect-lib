@@ -71,13 +71,13 @@ public final class ObjectWrapper
                     {
                         for(int j = 0; j < parameterTypes.length; j++)
                         {
-                            if(args[i] != null && !parameterTypes[i].isAssignableFrom(args[i].getClass()))
+                            if(args[j] != null && !parameterTypes[j].isAssignableFrom(args[j].getClass()))
                             {
                                 break;
                             }
                         }
                         // find method
-                        mObject = declaredMethod.invoke(mObject, args);
+                        mObject = declaredMethod.invoke(getObject(), args);
                         mField = null;
                     }
                 }
