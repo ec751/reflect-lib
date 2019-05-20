@@ -1,5 +1,6 @@
 package com.reflect.core;
 
+import java.io.FilterInputStream;
 import java.lang.reflect.Method;
 
 public final class ObjectWrapper
@@ -59,34 +60,37 @@ public final class ObjectWrapper
     {
         try
         {
-            Class<?> clazz = mField == null ? mObject.getClass() : mField.getType();
-            Method[] declaredMethods = clazz.getDeclaredMethods();
-            for(int i = 0; i < declaredMethods.length; i++)
+            for(Class<?> clazz = (mField == null ? mObject.getClass() : mField.getType()); clazz != null; clazz = clazz.getSuperclass())
             {
-                Method declaredMethod = declaredMethods[i];
-                if(declaredMethod.getName().equals(name))
+                Method[] declaredMethods = clazz.getDeclaredMethods();
+                for(int i = 0; i < declaredMethods.length; i++)
                 {
-                    Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
-                    if(args.length == parameterTypes.length)
+                    Method declaredMethod = declaredMethods[i];
+                    if(declaredMethod.getName().equals(name))
                     {
-                        for(int j = 0; j < parameterTypes.length; j++)
+                        Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
+                        if(args.length == parameterTypes.length)
                         {
-                            if(args[j] != null && !parameterTypes[j].isAssignableFrom(args[j].getClass()))
+                            for(int j = 0; j < parameterTypes.length; j++)
                             {
-                                break;
+                                if(args[j] != null && !parameterTypes[j].isAssignableFrom(args[j].getClass()))
+                                {
+                                    break;
+                                }
                             }
+                            mObject = declaredMethod.invoke(getObject(), args);
+                            mField = null;
+                            return this;
                         }
-                        // find method
-                        mObject = declaredMethod.invoke(getObject(), args);
-                        mField = null;
                     }
                 }
             }
-            return this;
+            throw new NoSuchMethodException(name);
         }
         catch(Exception e)
         {
             throw new RuntimeException(e);
         }
     }
+
 }
