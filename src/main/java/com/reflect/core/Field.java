@@ -3,82 +3,33 @@ package com.reflect.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-/**
- * Created by jrsen on 16-4-29.
- */
-public final class Field<T> extends AccessibleObject {
+public interface Field<T>
+{
+    T getUnsafe(Object obj) throws Exception;
 
-    private final java.lang.reflect.Field field;
+    T get(Object obj);
 
-    public Field(java.lang.reflect.Field field) {
-        this.field = field;
-    }
+    void setUnsafe(Object obj, T value) throws Exception;
 
-    @SuppressWarnings("unchecked")
-    public T getUnsafe(Object obj) throws Exception {
-        fixAccessible(field);
-        return (T) field.get(obj);
-    }
+    void set(Object obj, T value);
 
-    public T get(Object obj) {
-        try {
-            return getUnsafe(obj);
-        } catch (Exception ignore) {
-        }
-        return null;
-    }
+    int getModifiers();
 
-    public void setUnsafe(Object obj, T value) throws Exception {
-        if (!field.isAccessible())
-            field.setAccessible(true);
-        field.set(obj, value);
-    }
+    boolean isEnumConstant();
 
-    public void set(Object obj, T value) {
-        try {
-            setUnsafe(obj, value);
-        } catch (Exception ignore) {
-        }
-    }
+    boolean isSynthetic();
 
-    public int getModifiers() {
-        return field.getModifiers();
-    }
+    String getName();
 
-    public boolean isEnumConstant() {
-        return field.isEnumConstant();
-    }
+    Class<?> getDeclaringClass();
 
-    public boolean isSynthetic() {
-        return field.isSynthetic();
-    }
+    Class<?> getType();
 
-    public String getName() {
-        return field.getName();
-    }
+    Type getGenericType();
 
-    public Class<?> getDeclaringClass() {
-        return field.getDeclaringClass();
-    }
+    Annotation[] getDeclaredAnnotations();
 
-    public Class<?> getType() {
-        return field.getType();
-    }
+    <A extends Annotation> A getAnnotation(Class<A> annotationType);
 
-    public Type getGenericType() {
-        return field.getGenericType();
-    }
-
-    public Annotation[] getDeclaredAnnotations() {
-        return field.getDeclaredAnnotations();
-    }
-
-    public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
-        return field.getAnnotation(annotationType);
-    }
-
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
-        return field.isAnnotationPresent(annotationType);
-    }
-
+    boolean isAnnotationPresent(Class<? extends Annotation> annotationType);
 }

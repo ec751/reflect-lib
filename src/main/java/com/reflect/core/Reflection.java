@@ -54,10 +54,8 @@ public final class Reflection {
     private static void linkToConstructor(ClassLoader classLoader, Class<?> clazz, java.lang.reflect.Field injectField) {
         try {
             Constructor<?> constructor = getConstructor(clazz, getParameterTypes(classLoader, injectField));
-            if (constructor != null) {
-                injectField.setAccessible(true);
-                injectField.set(null, constructor);
-            }
+            injectField.setAccessible(true);
+            injectField.set(null, constructor);
         } catch (Throwable ignore) {
         }
     }
@@ -67,10 +65,8 @@ public final class Reflection {
             String name = injectField.isAnnotationPresent(Parameter.class) && !injectField.getAnnotation(Parameter.class).name().isEmpty()
                 ? injectField.getAnnotation(Parameter.class).name() : injectField.getName();
             Method<?> method = getMethod(clazz, name, getParameterTypes(classLoader, injectField));
-            if (method != null) {
-                injectField.setAccessible(true);
-                injectField.set(null, method);
-            }
+            injectField.setAccessible(true);
+            injectField.set(null, method);
         } catch (Throwable ignore) {
         }
     }
@@ -80,10 +76,8 @@ public final class Reflection {
             String name = injectField.isAnnotationPresent(Parameter.class) && !injectField.getAnnotation(Parameter.class).name().isEmpty()
                 ? injectField.getAnnotation(Parameter.class).name() : injectField.getName();
             StaticMethod<?> staticMethod = getStaticMethod(clazz, name, getParameterTypes(classLoader, injectField));
-            if (staticMethod != null) {
-                injectField.setAccessible(true);
-                injectField.set(null, staticMethod);
-            }
+            injectField.setAccessible(true);
+            injectField.set(null, staticMethod);
         } catch (Throwable ignore) {
         }
     }
@@ -93,10 +87,8 @@ public final class Reflection {
             String name = injectField.isAnnotationPresent(Parameter.class) && !injectField.getAnnotation(Parameter.class).name().isEmpty()
                 ? injectField.getAnnotation(Parameter.class).name() : injectField.getName();
             Field<?> field = getField(clazz, name);
-            if (field != null) {
-                injectField.setAccessible(true);
-                injectField.set(null, field);
-            }
+            injectField.setAccessible(true);
+            injectField.set(null, field);
         } catch (Throwable ignore) {
         }
     }
@@ -106,10 +98,8 @@ public final class Reflection {
             String name = injectField.isAnnotationPresent(Parameter.class) && !injectField.getAnnotation(Parameter.class).name().isEmpty()
                 ? injectField.getAnnotation(Parameter.class).name() : injectField.getName();
             StaticField<?> staticField = getStaticField(clazz, name);
-            if (staticField != null) {
-                injectField.setAccessible(true);
-                injectField.set(null, staticField);
-            }
+            injectField.setAccessible(true);
+            injectField.set(null, staticField);
         } catch (Throwable ignore) {
         }
     }
@@ -171,8 +161,7 @@ public final class Reflection {
         try {
             return getConstructor(Class.forName(srcClass), parameterTypes);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newConstructorNullImpl(String.format("can't found constructor in %s", srcClass));
         }
     }
 
@@ -182,10 +171,9 @@ public final class Reflection {
             if (!constructor.isAccessible()) {
                 constructor.setAccessible(true);
             }
-            return new Constructor<>(constructor);
+            return new ConstructorImpl<>(constructor);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newConstructorNullImpl(String.format("can't found constructor in %s", srcClass.getName()));
         }
     }
 
@@ -193,8 +181,7 @@ public final class Reflection {
         try {
             return getField(Class.forName(srcClass), fieldName);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newFieldNullImpl(String.format("%s not found in %s", fieldName, srcClass));
         }
     }
 
@@ -204,10 +191,9 @@ public final class Reflection {
             if (!field.isAccessible()) {
                 field.setAccessible(true);
             }
-            return new Field<>(field);
+            return new FieldImpl<>(field);
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newFieldNullImpl(String.format("%s not found in %s", fieldName, srcClass.getName()));
         }
     }
 
@@ -215,8 +201,7 @@ public final class Reflection {
         try {
             return getStaticField(Class.forName(srcClass), fieldName);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newStaticFieldNullImpl(String.format("%s not found in %s", fieldName, srcClass));
         }
     }
 
@@ -226,10 +211,9 @@ public final class Reflection {
             if (!field.isAccessible()) {
                 field.setAccessible(true);
             }
-            return new StaticField<>(field);
+            return new StaticFieldImpl<>(field);
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newStaticFieldNullImpl(String.format("%s not found in %s", fieldName, srcClass.getName()));
         }
     }
 
@@ -237,8 +221,7 @@ public final class Reflection {
         try {
             return getMethod(Class.forName(srcClass), methodName, parameterTypes);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newMethodNullImpl(String.format("%s not found in %s", methodName, srcClass));
         }
     }
 
@@ -248,10 +231,9 @@ public final class Reflection {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
-            return new Method<>(method);
+            return new MethodImpl<>(method);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newMethodNullImpl(String.format("%s not found in %s", methodName, srcClass.getName()));
         }
     }
 
@@ -259,8 +241,7 @@ public final class Reflection {
         try {
             return getStaticMethod(Class.forName(srcClass), methodName, parameterTypes);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newStaticMethodNullImpl(String.format("%s not found in %s", methodName, srcClass));
         }
     }
 
@@ -270,10 +251,9 @@ public final class Reflection {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
-            return new StaticMethod<>(method);
+            return new StaticMethodImpl<>(method);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            return null;
+            return NullImpl.newStaticMethodNullImpl(String.format("%s not found in %s", methodName, srcClass.getName()));
         }
     }
 

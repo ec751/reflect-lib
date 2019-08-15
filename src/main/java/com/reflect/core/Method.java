@@ -4,109 +4,49 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-/**
- * Created by jrsen on 16-4-29.
- */
-public final class Method<T> extends AccessibleObject {
+public interface Method<T>
+{
+    T invokeUnsafe(Object obj, Object... args) throws Exception;
 
-    private final java.lang.reflect.Method method;
+    T invoke(Object obj, Object... args);
 
-    public Method(java.lang.reflect.Method method) {
-        this.method = method;
-    }
+    Annotation[] getAnnotations();
 
-    @SuppressWarnings("unchecked")
-    public T invokeUnsafe(Object obj, Object... args) throws Exception {
-        fixAccessible(method);
-        return (T) method.invoke(obj, args);
-    }
+    int getModifiers();
 
-    public T invoke(Object obj, Object... args) {
-        try {
-            return invokeUnsafe(obj, args);
-        } catch (Throwable ignore) {
-            return null;
-        }
-    }
+    boolean isVarArgs();
 
-    public Annotation[] getAnnotations() {
-        return method.getAnnotations();
-    }
+    boolean isBridge();
 
-    public int getModifiers() {
-        return method.getModifiers();
-    }
+    boolean isSynthetic();
 
-    public boolean isVarArgs() {
-        return method.isVarArgs();
-    }
+    String getName();
 
-    public boolean isBridge() {
-        return method.isBridge();
-    }
+    Class<?> getDeclaringClass();
 
-    public boolean isSynthetic() {
-        return method.isSynthetic();
-    }
+    Class<?>[] getExceptionTypes();
 
-    public String getName() {
-        return method.getName();
-    }
+    Class<?>[] getParameterTypes();
 
-    public Class<?> getDeclaringClass() {
-        return method.getDeclaringClass();
-    }
+    Class<?> getReturnType();
 
-    public Class<?>[] getExceptionTypes() {
-        return method.getExceptionTypes();
-    }
+    String toGenericString();
 
-    public Class<?>[] getParameterTypes() {
-        return method.getParameterTypes();
-    }
+    TypeVariable<java.lang.reflect.Method>[] getTypeParameters();
 
-    public Class<?> getReturnType() {
-        return method.getReturnType();
-    }
+    Type[] getGenericParameterTypes();
 
-    public String toGenericString() {
-        return method.toGenericString();
-    }
+    boolean isAnnotationPresent(Class<? extends Annotation> annotationType);
 
-    public TypeVariable<java.lang.reflect.Method>[] getTypeParameters() {
-        return method.getTypeParameters();
-    }
+    Type[] getGenericExceptionTypes();
 
-    public Type[] getGenericParameterTypes() {
-        return method.getGenericParameterTypes();
-    }
+    Type getGenericReturnType();
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
-        return method.isAnnotationPresent(annotationType);
-    }
+    Annotation[] getDeclaredAnnotations();
 
-    public Type[] getGenericExceptionTypes() {
-        return method.getGenericExceptionTypes();
-    }
+    <A extends Annotation> A getAnnotation(Class<A> annotationType);
 
-    public Type getGenericReturnType() {
-        return method.getGenericReturnType();
-    }
+    Annotation[][] getParameterAnnotations();
 
-    public Annotation[] getDeclaredAnnotations() {
-        return method.getDeclaredAnnotations();
-    }
-
-    public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
-        return method.getAnnotation(annotationType);
-    }
-
-    public Annotation[][] getParameterAnnotations() {
-        return method.getParameterAnnotations();
-    }
-
-    public Object getDefaultValue() {
-        return method.getDefaultValue();
-    }
-
+    Object getDefaultValue();
 }

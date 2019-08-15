@@ -4,114 +4,44 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-/**
- * Created by jrsen on 16-4-29.
- */
-public final class Constructor<T> {
+public interface Constructor<T>
+{
 
-    private final java.lang.reflect.Constructor constructor;
+    T newInstanceUnSafe(Object... args) throws Exception;
 
-    public Constructor(java.lang.reflect.Constructor constructor) {
-        this.constructor = constructor;
-    }
+    T newInstance(Object... args);
 
-    @SuppressWarnings("unchecked")
-    public T newInstanceUnSafe(Object... args) throws Exception {
-        if (!constructor.isAccessible())
-            constructor.setAccessible(true);
-        return (T) constructor.newInstance(args);
-    }
+    Annotation[] getAnnotations();
 
-    public T newInstance(Object... args) {
-        try {
-            return newInstanceUnSafe(args);
-        } catch (Throwable ignore) {
-            return null;
-        }
-    }
+    int getModifiers();
 
-    public Annotation[] getAnnotations()
-    {
-        return constructor.getAnnotations();
-    }
+    boolean isVarArgs();
 
-    public int getModifiers()
-    {
-        return constructor.getModifiers();
-    }
+    boolean isSynthetic();
 
-    public boolean isVarArgs()
-    {
-        return constructor.isVarArgs();
-    }
+    String getName();
 
-    public boolean isSynthetic()
-    {
-        return constructor.isSynthetic();
-    }
+    Class getDeclaringClass();
 
-    public String getName()
-    {
-        return constructor.getName();
-    }
+    Class<?>[] getExceptionTypes();
 
-    public Class getDeclaringClass()
-    {
-        return constructor.getDeclaringClass();
-    }
+    Class<?>[] getParameterTypes();
 
-    public Class<?>[] getExceptionTypes()
-    {
-        return constructor.getExceptionTypes();
-    }
+    TypeVariable<java.lang.reflect.Constructor>[] getTypeParameters();
 
-    public Class<?>[] getParameterTypes()
-    {
-        return constructor.getParameterTypes();
-    }
+    String toGenericString();
 
-    public TypeVariable<java.lang.reflect.Constructor>[] getTypeParameters()
-    {
-        return constructor.getTypeParameters();
-    }
+    Type[] getGenericParameterTypes();
 
-    public String toGenericString()
-    {
-        return constructor.toGenericString();
-    }
+    Type[] getGenericExceptionTypes();
 
-    public Type[] getGenericParameterTypes()
-    {
-        return constructor.getGenericParameterTypes();
-    }
+    Annotation[] getDeclaredAnnotations();
 
-    public Type[] getGenericExceptionTypes()
-    {
-        return constructor.getGenericExceptionTypes();
-    }
+    Annotation[][] getParameterAnnotations();
 
-    public Annotation[] getDeclaredAnnotations()
-    {
-        return constructor.getDeclaredAnnotations();
-    }
+    boolean isAccessible();
 
-    public Annotation[][] getParameterAnnotations()
-    {
-        return constructor.getParameterAnnotations();
-    }
+    boolean isAnnotationPresent(Class<? extends Annotation> annotationType);
 
-    public boolean isAccessible()
-    {
-        return constructor.isAccessible();
-    }
-
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType)
-    {
-        return constructor.isAnnotationPresent(annotationType);
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotationType)
-    {
-        return (T)constructor.getAnnotation(annotationType);
-    }
+    <A extends Annotation> A getAnnotation(Class<A> annotationType);
 }

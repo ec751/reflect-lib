@@ -1,6 +1,5 @@
 package com.reflect.core;
 
-import java.io.FilterInputStream;
 import java.lang.reflect.Method;
 
 public final class ObjectWrapper
@@ -23,7 +22,7 @@ public final class ObjectWrapper
             {
                 try
                 {
-                    mField = new Field<>(clazz.getDeclaredField(name));
+                    mField = new FieldImpl<>(clazz.getDeclaredField(name));
                     return this;
                 }
                 catch(NoSuchFieldException ignore)
