@@ -30,7 +30,7 @@ final class ConstructorImpl<T> implements Constructor<T>
     {
         try
         {
-            return newInstanceUnSafe();
+            return newInstanceUnSafe(args);
         }
         catch(Exception ignore)
         {
