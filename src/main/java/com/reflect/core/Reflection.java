@@ -14,8 +14,8 @@ public final class Reflection {
     public static <T> Class<T> init(ClassLoader classLoader, String srcClass, Class<?> injectClass) {
         try {
             return (Class<T>) init(classLoader, classLoader.loadClass(srcClass), injectClass);
-        } catch (ClassNotFoundException ignore) {
-//            ignore.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -24,8 +24,8 @@ public final class Reflection {
     public static <T> Class<T> init(String srcClass, Class<?> injectClass) {
         try {
             return (Class<T>) init(ClassLoader.getSystemClassLoader(), Class.forName(srcClass), injectClass);
-        } catch (ClassNotFoundException ignore) {
-//            ignore.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
             return null;
         }
     }
